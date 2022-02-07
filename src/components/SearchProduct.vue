@@ -1,7 +1,7 @@
 <template>
 <div class="menu">
 
-  <input class="input upper" type="search" @input="filterProducts()" v-model="querySearch">
+  <input class="input upper" type="search" @input="filterProducts()" v-model.trim="querySearch">
   <ul class="menu-list">
       <li @click="emit('itemSelected',product)" v-for="product of productsFilter" :key="product.id">{{product.name}}</li>
   </ul>
@@ -25,6 +25,10 @@ onMounted(() => {
 })
 
 const filterProducts = () => {
+  if (querySearch.value === '') {
+    productsFilter.value = []
+    return
+  }
   const query = querySearch.value.toLowerCase()
 
   productsFilter.value = products.value.filter(({ name, code }) => name.toLowerCase().includes(query) || code.toString().toLowerCase().includes(query))

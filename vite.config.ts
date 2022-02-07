@@ -10,6 +10,9 @@ export default () => {
     define: {
       'process.env': process.env
     },
-    plugins: [vue()]
+    plugins: [vue()],
+    optimizeDeps: {
+      exclude: ['dist_electron/bundled/*']
+    }
   })
 }

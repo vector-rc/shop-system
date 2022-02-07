@@ -1,15 +1,16 @@
 <template>
-  <main class="container">
-    <!-- <view-product /> -->
-    <view-sale />
 
+  <main class="container">
+     <router-link class="button is-link" to='/'>Productos </router-link>
+  <router-link class="button is-link" to='/sale'> Ventas</router-link>
+    <router-view/>
   </main>
+
 </template>
 
 <script setup lang="ts">
 // import ViewProduct from './views/ViewProduct.vue'
 import { useStore } from 'vuex'
-import ViewSale from './views/ViewSale.vue'
 import { onMounted } from 'vue'
 
 const store = useStore()

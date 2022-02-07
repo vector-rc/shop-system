@@ -25,29 +25,32 @@
     </div>
   </div>
   <div class="column">
-    <table class="table">
+    <table class="table is-bordered is-striped">
       <thead>
         <tr>
-          <th>Id</th>
+          <!-- <th>Id</th> -->
           <th>Codigo</th>
           <th>Nombre</th>
           <th>Precio</th>
           <th>Cantidad</th>
           <th>Monto</th>
+          <th>Opciones</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="item of itemsCart" :key="item.id">
-          <th>{{item.id}}</th>
+          <!-- <th>{{item.id}}</th> -->
           <td>{{item.code}}</td>
           <td>{{item.name}}</td>
-          <td>{{item.price}}</td>
+          <td>S/. {{item.price}}</td>
           <td>{{item.quantity}}</td>
-          <td>{{item.mount}}</td>
+          <td>S/. {{item.mount}}</td>
+          <td><button class="button is-danger"><i class="bi bi-trash"></i></button></td>
         </tr>
       </tbody>
     </table>
-    <span>Total: {{totalMount}}</span>
+    <div>Total: S/. {{totalMount}}</div>
+    <button class="button is-primary">Realizar venta</button>
   </div>
 
   </div>
@@ -95,7 +98,9 @@ const codeScan = () => {
   setTimeout(() => {
     if (productCode.value === beforeCode) {
       const product = findProductByCode(productCode.value)
-      addProductToCart(product)
+      if (product) {
+        addProductToCart(product)
+      }
       productCode.value = ''
     }
   }, 100)
