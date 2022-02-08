@@ -50,7 +50,10 @@
       </tbody>
     </table>
     <div>Total: S/. {{totalMount}}</div>
-    <button class="button is-primary">Realizar venta</button>
+    <button @click="printer()" class="button is-primary">Realizar venta</button>
+  </div>
+  <div>
+    <iframe style="width:72mm;height:500px;border:solid #000 1px,;padding:0" name="page-printer" :srcdoc="textPrinter" ></iframe>
   </div>
 
   </div>
@@ -58,7 +61,7 @@
 
 <script setup lang="ts">
 import SearchProduct from '../components/SearchProduct.vue'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 
 const store = useStore()
@@ -67,6 +70,46 @@ const productCode = ref('')
 const fieldCode = ref()
 const scanningCode = ref(false)
 const itemsCart = ref([])
+const textPrinter = ref('')
+
+onMounted(() => {
+  textPrinter.value = `
+  <html>
+  <head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
+   <style>
+  pre{
+    font-family: 'Roboto Mono', monospace;
+    font-weight: bold;
+  }
+  </style></head>
+  <body>
+ 
+  <pre >
+        Supermarket Ticket
+Ginger A Store #12345REG #02
+Date:2006-04-09           Time:18:30
+------------------------------------
+Item                    Qty    Amount
+gaseosasddas dsdas      1.2    $1.00
+Sheepasdasdsdas         2.0    $5.00
+Brush adsd  sadasd      1.6    $3.8
+Beerasda  asdasdasdasd  2      $8.00
+------------------------------------
+Subtotal:
+Tax:
+Total:             $17.80
+------------------------------------
+   Customer signature
+        Thank you
+ Please come again soon
+  </pre>
+  </body>
+  </html>
+  `
+})
 
 const totalMount = computed(() => {
   return itemsCart.value.reduce((acumulate, currentValue) => {
@@ -104,6 +147,10 @@ const codeScan = () => {
       productCode.value = ''
     }
   }, 100)
+}
+const printer = () => {
+  window.frames['page-printer'].focus()
+  window.frames['page-printer'].print()
 }
 
 const focusCode = () => {
