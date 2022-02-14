@@ -1,8 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import 'dotenv/config'
-import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
-import polyfillNode from 'rollup-plugin-polyfill-node'
 
 // https://vitejs.dev/config/
 export default () => {
@@ -13,7 +11,7 @@ export default () => {
     define: {
       'process.env': process.env
     },
-    plugins: [vue(), viteCommonjs(), polyfillNode()],
+    plugins: [vue()],
     optimizeDeps: {
       exclude: ['dist_electron/bundled/*', 'escpos', 'escpos-usb']
     }

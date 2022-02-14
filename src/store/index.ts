@@ -39,6 +39,30 @@ export default createStore({
       })
       const res = await req.json()
       return res
+    },
+    async printerTicket (_, { text }) {
+      const req = await fetch(`${process.env.VUE_APP_URL_PRINTER}/printer/${localStorage.printer}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          qr_content: 'hola mundo'
+        })
+      })
+      const res = await req.text()
+      return res
+    },
+    async testEncode (_, { text }) {
+      const req = await fetch(`${process.env.VUE_APP_URL_PRINTER}/decodeurl`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          qr_content: 'hola mundo'
+        })
+      })
+      const res = await req.text()
+      return res
     }
   },
   modules: {

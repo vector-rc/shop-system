@@ -1,22 +1,22 @@
 <template>
-
-  <main class="container">
-     <router-link class="button is-link" to='/'>Productos </router-link>
-  <router-link class="button is-link" to='/sale'> Ventas</router-link>
-    <router-view/>
+  <main class="container" v-if="isLoadData">
+    <router-link class="button is-link" to="/">Productos </router-link>
+    <router-link class="button is-link" to="/sale"> Ventas</router-link>
+    <router-link class="button is-link" to="/printers"> impresoras</router-link>
+    <router-view />
   </main>
-
 </template>
 
 <script setup lang="ts">
-// import ViewProduct from './views/ViewProduct.vue'
 import { useStore } from 'vuex'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const store = useStore()
+const isLoadData = ref(false)
+
 onMounted(async () => {
   const res = await store.dispatch('fetchProducts')
-  console.log(res)
+  isLoadData.value = res.success
 })
 </script>
 
