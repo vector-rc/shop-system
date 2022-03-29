@@ -1,0 +1,12 @@
+.toast {
+  margin: 1rem;
+  transition: all 1s;
+}
+.toastContainer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+}

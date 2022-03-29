@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-const printers = ref([])
+const printers = ref([] as any[])
 const printerSelected = ref('')
 
 onMounted(async () => {

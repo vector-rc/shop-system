@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import 'dotenv/config'
+import path from 'path'
 
 // https://vitejs.dev/config/
 export default () => {
@@ -12,8 +13,13 @@ export default () => {
       'process.env': process.env
     },
     plugins: [vue()],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src')
+      }
+    },
     optimizeDeps: {
-      exclude: ['dist_electron/bundled/*', 'escpos', 'escpos-usb']
+      exclude: ['dist_electron/bundled/*']
     }
   })
 }

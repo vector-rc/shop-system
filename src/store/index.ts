@@ -2,51 +2,240 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    hola: 'jajjajajaja',
-    products: []
+    products: [] as any[],
+    user: {} as any,
+    isAuthenticated: false
+
   },
   mutations: {
     test () {
       console.log('hola desde vuex')
-    },
-    hola () {
-      return '123456'
     }
 
   },
   actions: {
-    hola () {
-      return '123456'
-    },
     async fetchProducts ({ state }) {
-      const req = await fetch(`${process.env.VUE_APP_URL_API}/products`)
-      const res = await req.json()
-      if (res.success) {
-        state.products = res.data
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/products`)
+        const res = await req.json()
+        if (res.success) {
+          state.products = res.data.reverse()
+        }
+        return res
+      } catch (error:any) {
+        console.log(error.type)
+
+        return { success: true, message: error }
       }
-      return res
     },
-    async saveProduct (_, { action, product }) {
-      console.log(product)
-
-      const req = await fetch(`${process.env.VUE_APP_URL_API}/product`, {
-        method: action === 'add' ? 'POST' : 'PUT',
-        headers: {
-          Authorization: 'bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyTmFtZSI6InRlc3Q3In0.hwfJ7t6ua28NzQYUXflhJtogxoN3cJWdXWyJrJgTkzmtCJCiILUQ-R7B5Fk8jkMY791uMb1RrmjDqoIyxkqpDSXtG0Mwgd13bWBBB5JbSaakhZrU9lBlkb093jhGrGAUueVoHzQ7p0dfwRkSSJu-DDI-qk_pAY5H2XFYPitH2lE'
-        },
-        body: JSON.stringify(product)
-
-      })
-      const res = await req.json()
-      return res
+    async fetchSales ({ state }) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/sales`, { headers: { Authorization: `bearer ${state.user.token} ` } })
+        const res = await req.json()
+        return res
+      } catch (error:any) {
+        console.log(error.type)
+        return { success: false, message: error }
+      }
     },
-    async printerTicket (_, { text }) {
+    async fetchUsers ({ state }) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/users`, { headers: { Authorization: `bearer ${state.user.token} ` } })
+        const res = await req.json()
+        return res
+      } catch (error:any) {
+        console.log(error.type)
+        return { success: false, message: error }
+      }
+    },
+    async fetchBoletas ({ state }) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/boletas`, { headers: { Authorization: `bearer ${state.user.token} ` } })
+        const res = await req.json()
+        return res
+      } catch (error:any) {
+        console.log(error.type)
+        return { success: false, message: error }
+      }
+    },
+    async fetchFacturas ({ state }) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/facturas`, { headers: { Authorization: `bearer ${state.user.token} ` } })
+        const res = await req.json()
+        return res
+      } catch (error:any) {
+        console.log(error.type)
+        return { success: false, message: error }
+      }
+    },
+    async fetchSaleDetail ({ state }, { id }) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/saleDetail/${id}`, { headers: { Authorization: `bearer ${state.user.token} ` } })
+        const res = await req.json()
+        return res
+      } catch (error:any) {
+        console.log(error.type)
+        return { success: false, message: error }
+      }
+    },
+    async fetchBoletaDetail ({ state }, { id }) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/boletaDetail/${id}`, { headers: { Authorization: `bearer ${state.user.token} ` } })
+        const res = await req.json()
+        return res
+      } catch (error:any) {
+        console.log(error.type)
+        return { success: false, message: error }
+      }
+    },
+    async fetchFacturaDetail ({ state }, { id }) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/facturaDetail/${id}`, { headers: { Authorization: `bearer ${state.user.token} ` } })
+        const res = await req.json()
+        return res
+      } catch (error:any) {
+        console.log(error.type)
+        return { success: false, message: error }
+      }
+    },
+
+    async fetchPackProducts ({ state }, { id }) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/pack_product/${id}`, { headers: { Authorization: `bearer ${state.user.token} ` } })
+        const res = await req.json()
+        return res
+      } catch (error:any) {
+        return { data: null, success: true, message: error }
+      }
+    },
+    async fetchRoles () {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/user_roles`)
+        const res = await req.json()
+        return res
+      } catch (error:any) {
+        return { success: true, message: error }
+      }
+    },
+
+    async userLogin ({ state }, { credentials }) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/login`, {
+          method: 'POST',
+          body: JSON.stringify(credentials)
+
+        })
+        const res = await req.json()
+        console.log(res)
+
+        if (res.success) {
+          state.user = res.data
+          state.isAuthenticated = res.success
+          localStorage.token = res.data.token
+        }
+        return res
+      } catch (error:any) {
+        console.log(error)
+
+        return { success: false, message: error }
+      }
+    },
+    async userSignup ({ state }, { user }) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/signup`, {
+          method: 'POST',
+          headers: { Authorization: `bearer ${state.user.token} ` },
+          body: JSON.stringify(user)
+
+        })
+        const res = await req.json()
+        return res
+      } catch (error:any) {
+        console.log(error)
+
+        return { success: false, message: error }
+      }
+    },
+    async changePassword ({ state }: any, { currentPassword, newPassword }: any) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/changePassword`, {
+          method: 'POST',
+          headers: { Authorization: `bearer ${state.user.token} ` },
+          body: JSON.stringify({ currentPassword, newPassword })
+
+        })
+        const res = await req.json()
+        return res
+      } catch (error:any) {
+        console.log(error)
+
+        return { success: false, message: error }
+      }
+    },
+
+    async saveProduct ({ state }, { action, product }) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/product`, {
+          method: action === 'add' ? 'POST' : 'PUT',
+          headers: { Authorization: `bearer ${state.user.token} ` },
+          body: JSON.stringify(product)
+
+        })
+        const res :any = await req.json()
+        if (res.success) {
+          if (action === 'add') state.products.unshift(res.data)
+          if (action === 'edit') {
+            const index = state.products.findIndex(el => el.id === product.id)
+            console.log(index)
+            state.products[index] = res.data
+          }
+        }
+        return res
+      } catch (error) {
+
+      }
+    },
+    async savePackingProduct ({ state }, { action, data }) {
+      console.log({ action })
+      data.packedProducts = data.packedProducts.map(({ id, productId, code, packing, measureUnit, priceBuy, priceSale, stock }:any) => ({
+        id,
+        productId,
+        code,
+        packing,
+        measureUnit,
+        priceBuy,
+        priceSale,
+        stock
+      }))
+
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/product`, {
+          method: action === 'add' ? 'POST' : 'PUT',
+          headers: { Authorization: `bearer ${state.user.token} ` },
+          body: JSON.stringify(data)
+
+        })
+        const res :any = await req.json()
+        // if (res.success) {
+        //   if (action === 'add') state.products.unshift(res.data)
+        //   if (action === 'edit') {
+        //     const index = state.products.findIndex(el => el.id === product.id)
+        //     console.log(index)
+        //     state.products[index] = res.data
+        //   }
+        // }
+        return res
+      } catch (error) {
+
+      }
+    },
+    async printerTicket (_, { text, qrContent }) {
       const req = await fetch(`${process.env.VUE_APP_URL_PRINTER}/printer/${localStorage.printer}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text,
-          qr_content: 'hola mundo'
+          qr_content: qrContent
         })
       })
       const res = await req.text()
@@ -63,7 +252,88 @@ export default createStore({
       })
       const res = await req.text()
       return res
+    },
+    async getInfoDoc ({ state }, { typeDoc, document }) {
+      let req:any
+      console.log(typeDoc)
+      if (typeDoc === 1) req = await fetch(`${process.env.VUE_APP_URL_API}/dni/${document}`, { headers: { Authorization: `bearer ${state.user.token} ` } })
+      if (typeDoc === 6) req = await fetch(`${process.env.VUE_APP_URL_API}/ruc/${document}`, { headers: { Authorization: `bearer ${state.user.token} ` } })
+
+      const res = await req.json()
+      return res.data
+    },
+    async saveSale ({ state }, { soldProducts, client, typeProof }) {
+      const req = await fetch(`${process.env.VUE_APP_URL_API}/sale`,
+        {
+          method: 'POST',
+          headers: { Authorization: `bearer ${state.user.token} ` },
+          body: JSON.stringify({
+            soldProducts,
+            client,
+            userId: state.user.id,
+            typeProof
+          })
+        })
+
+      const res = await req.json()
+      return res.data
+    },
+    async sendSummaries ({ state }) {
+      const req = await fetch(`${process.env.VUE_APP_URL_API}/sendResumenes`,
+        {
+          method: 'POST',
+          headers: { Authorization: `bearer ${state.user.token} ` }
+        })
+
+      const res = await req.json()
+      return res
+    },
+    async testEmail ({ state }) {
+      const req = await fetch(`${process.env.VUE_APP_URL_API}/testEmail`,
+        {
+          headers: { Authorization: `bearer ${state.user.token} ` }
+        })
+
+      const res = await req.json()
+      return res
+    },
+    async darBaja ({ state }, { proofId, typeProof, motivoBaja }) {
+      let endpoint = ''
+      let body = ''
+      if (typeProof === 'boleta') {
+        endpoint = 'bajaBoleta'
+        body = JSON.stringify({ idBoleta: proofId })
+      }
+      if (typeProof === 'factura') {
+        endpoint = 'bajaFactura'
+        body = JSON.stringify({ idFactura: proofId, motivoBaja })
+      }
+
+      const req = await fetch(`${process.env.VUE_APP_URL_API}/${endpoint}`,
+        {
+          method: 'POST',
+          headers: { Authorization: `bearer ${state.user.token} ` },
+          body
+        })
+
+      const res = await req.json()
+      return res
+    },
+    async fetchProof (_, { proof }) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/comprobante`,
+          {
+            method: 'POST',
+            body: JSON.stringify(proof)
+          })
+
+        const res = await req.json()
+        return res
+      } catch (error) {
+        return { success: false, message: error }
+      }
     }
+
   },
   modules: {
   }
