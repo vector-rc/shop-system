@@ -5,13 +5,13 @@
       <article class="message is-danger">
         <div class="message-header">
           <p>Danger</p>
-          <button class="delete" @click="showModalBaja=false" aria-label="delete"></button>
+          <button class="delete" @click="showModalBaja = false" aria-label="delete"></button>
         </div>
         <div class="message-body">
           <span>¿¿ Esta seguro de dar de baja esta {{ typeProof }}?</span>
           <span>Una vez que se dea de baja ya no se podra recuperar</span>
-          <br>
-          <br>
+          <br />
+          <br />
           <div class="field" v-if="typeProof === 'factura'">
             <label class="label">Motivo de Baja</label>
             <p class="control">
@@ -22,8 +22,45 @@
               />
             </p>
           </div>
-            <button :disabled="waitingBaja" class="button is-danger mx-2" @click="darDeBaja()">Dar de baja</button>
-            <button class="button" @click="showModalBaja = false">Cancelar</button>
+          <button
+            :disabled="waitingBaja"
+            class="button is-danger mx-2"
+            @click="darDeBaja()"
+            :class="{ 'is-loading': waitingBaja }"
+          >Dar de baja</button>
+          <button class="button" @click="showModalBaja = false">Cancelar</button>
+        </div>
+      </article>
+    </div>
+  </div>
+  <div class="modal is-active" style="z-index: 9999 ;" v-if="showModalEmail">
+    <div class="modal-background"></div>
+    <div class="modal-content" style="width: 35%; height: 30%;">
+      <article class="message is-primary">
+        <div class="message-header">
+          <p>Enviar comprobante por email</p>
+          <button class="delete" @click="showModalEmail = false" aria-label="delete"></button>
+        </div>
+        <div class="message-body">
+          <div class="field">
+            <label class="label">Email:</label>
+            <p class="control">
+              <input
+                :class="{ 'is-danger': !validEmail }"
+                class="input"
+                type="email"
+                placeholder="mail@example.com"
+                v-model="client.email"
+              />
+            </p>
+          </div>
+          <button
+            :disabled="waitingSendEmail || !validEmail"
+            class="button is-primary mx-2"
+            @click="sendByEmail()"
+            :class="{ 'is-loading': waitingSendEmail }"
+          >Enviar</button>
+          <button class="button" @click="showModalEmail = false">Cancelar</button>
         </div>
       </article>
     </div>
@@ -58,14 +95,18 @@
               <td>{{ proof.dateTime }}</td>
             </tr>
             <tr>
-              <td colspan="2" >
+              <td colspan="2">
                 <button
                   type="button"
                   @click="showModalBaja = true"
                   :disabled="!bajaDisponible"
+                  :class="{ 'is-loading': waitingBaja }"
                   class="button is-danger"
                 >DAR DE BAJA LA {{ typeProof.toLocaleUpperCase() }}</button>
-                <span class="tag is-danger m-2" v-if="!bajaDisponible"> LA {{ typeProof.toLocaleUpperCase() }} YA HA SIDO DADA DE BAJA</span>
+                <span
+                  class="tag is-danger m-2"
+                  v-if="!bajaDisponible"
+                >LA {{ typeProof.toLocaleUpperCase() }} YA HA SIDO DADA DE BAJA</span>
               </td>
             </tr>
           </tbody>
@@ -123,10 +164,24 @@
       </section>
       <footer class="modal-card-foot">
         <button
-          :disabled="waitingPrint || (!bajaDisponible && typeProof!=='ticket')"
+          :disabled="waitingPrint || (!bajaDisponible && typeProof !== 'ticket')"
+          :class="{ 'is-loading': waitingPrint }"
           @click="print()"
           class="button is-success"
         >Imprimir copia de {{ typeProof }}</button>
+        <button
+          v-if="typeProof !== 'ticket'"
+          :disabled="waitingSendEmail || proof.enable===0 "
+          :class="{ 'is-loading': waitingSendEmail }"
+          @click="showModalEmail = true"
+          class="button is-success"
+        >Enviar {{ typeProof }} por email</button>
+        <button
+          v-if="typeProof !== 'ticket'"
+          :disabled="proof.enable===0 "
+          @click="openPdf()"
+          class="button is-success"
+        >Ver pdf de la {{ typeProof }}</button>
         <button @click="emit('hide')" class="button">Cancelar</button>
       </footer>
     </div>
@@ -137,6 +192,7 @@
 import { ref, watchEffect } from 'vue'
 import { useStore } from 'vuex'
 import { toast } from '@/utils/toast'
+import { useRouter } from 'vue-router'
 
 const store = useStore()
 
@@ -145,6 +201,7 @@ const emit = defineEmits(['save', 'hide'])
 
 const show = ref(props.show)
 const showModalBaja = ref(false)
+const showModalEmail = ref(false)
 
 const typeProof = ref('ticket')
 const totalMount = ref(0)
@@ -156,14 +213,27 @@ const loadAll = ref(false)
 
 const waitingPrint = ref(false)
 const waitingBaja = ref(false)
+const waitingSendEmail = ref(false)
+
 const bajaDisponible = ref(true)
 const motivoBaja = ref('ERROR EN LOS CALCULOS')
+const validEmail = ref(true)
 
 const saleId = ref(props.saleId)
 const soldProducts = ref([] as any)
 
+const router = useRouter()
+
 watchEffect(() => {
   show.value = props.show
+})
+
+watchEffect(() => {
+  validEmail.value = client.value.email !== undefined
+    ? client.value.email.match(
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    )
+    : false
 })
 
 watchEffect(async () => {
@@ -209,6 +279,7 @@ ID Venta: 00000${sale.id}
 CLIENTE:
 Documento: ${client.document}
 Nombre: ${client.name}
+Direccion: ${!client.address ? '------------------' : client.address.direccion}
 `
   }
 
@@ -293,6 +364,44 @@ const print = async () => {
   }
 }
 
+const sendByEmail = async () => {
+  if (typeProof.value === 'ticket') return
+  waitingSendEmail.value = true
+
+  try {
+    const dataProof = `20605808931|${typeProof.value === 'boleta' ? '03' : '01'}|${proof.value.serie}|${buildCorrelative(proof.value.correlative)}|${Math.round((sale.value.total * (18 / 118) + Number.EPSILON) * 10) / 10}|${sale.value.total}|${proof.value.dateTime.slice(0, 10)}|0${client.value.documentType}|${client.value.document}`
+    console.log(client.value.email)
+
+    const res = await store.dispatch('sendProofByEmail', { dataProof, email: client.value.email })
+    if (!res.success) {
+      toast.danger(res.message, 6000)
+    } else {
+      toast.success(res.message, 5000)
+    }
+    waitingSendEmail.value = false
+    showModalEmail.value = false
+
+    // emit('hide')
+  } catch (error) {
+    waitingSendEmail.value = false
+    toast.danger('ha ocurriod un error, no se ha podido enviar el email', 3000)
+    showModalEmail.value = false
+  }
+}
+
+const utf8ToBase64 = (str: string) => {
+  return window.btoa(unescape(encodeURIComponent(str)))
+}
+
+const openPdf = async () => {
+  if (typeProof.value === 'ticket') return
+  waitingSendEmail.value = true
+
+  const dataProof = `20605808931|${typeProof.value === 'boleta' ? '03' : '01'}|${proof.value.serie}|${buildCorrelative(proof.value.correlative)}|${Math.round((sale.value.total * (18 / 118) + Number.EPSILON) * 10) / 10}|${sale.value.total}|${proof.value.dateTime.slice(0, 10)}|0${client.value.documentType}|${client.value.document}`
+
+  router.push('/comprobante/' + utf8ToBase64(dataProof).replaceAll('=', ''))
+}
+
 const darDeBaja = async () => {
   waitingBaja.value = true
   try {
@@ -305,7 +414,7 @@ const darDeBaja = async () => {
   } catch (error: any) {
     waitingBaja.value = false
     toast.danger(error, 3000)
-
+    showModalBaja.value = false
     bajaDisponible.value = true
   }
 }

@@ -1,5 +1,5 @@
 <template>
-    <NavBar v-if="isAuthenticated" @show-drawer="showDrawer=!showDrawer" />
+  <NavBar v-if="isAuthenticated" @show-drawer="showDrawer=!showDrawer" />
   <DrawerMenu v-if="isAuthenticated" :class="{'active':showDrawer}" />
   <main>
     <div style="padding:0.5rem;">
@@ -37,7 +37,6 @@ const isAuthenticated = computed(() => {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;

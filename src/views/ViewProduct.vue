@@ -27,11 +27,10 @@ const updateProduct = (productId: number) => {
 
   show.value = true
   idp.value = productId
-  console.log(idp.value)
+  // console.log(idp.value)
 }
 const cancelEdit = () => {
   show.value = false
-
   idp.value = -1
 }
 

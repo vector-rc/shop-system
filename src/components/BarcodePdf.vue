@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="menu">
     <iframe ref="pdf" style="width: 1000px; height: 500px;"></iframe>
     <img ref="img" id="barcode" style="display: none;" />
@@ -55,4 +55,4 @@ const createPdf = async (codeToRender: string) => {
 </script>
 
 <style>
-</style>
+</style> -->

@@ -22,7 +22,7 @@ export default createStore({
           state.products = res.data.reverse()
         }
         return res
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error.type)
 
         return { success: true, message: error }
@@ -33,7 +33,7 @@ export default createStore({
         const req = await fetch(`${process.env.VUE_APP_URL_API}/sales`, { headers: { Authorization: `bearer ${state.user.token} ` } })
         const res = await req.json()
         return res
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error.type)
         return { success: false, message: error }
       }
@@ -43,7 +43,7 @@ export default createStore({
         const req = await fetch(`${process.env.VUE_APP_URL_API}/users`, { headers: { Authorization: `bearer ${state.user.token} ` } })
         const res = await req.json()
         return res
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error.type)
         return { success: false, message: error }
       }
@@ -53,7 +53,7 @@ export default createStore({
         const req = await fetch(`${process.env.VUE_APP_URL_API}/boletas`, { headers: { Authorization: `bearer ${state.user.token} ` } })
         const res = await req.json()
         return res
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error.type)
         return { success: false, message: error }
       }
@@ -63,7 +63,7 @@ export default createStore({
         const req = await fetch(`${process.env.VUE_APP_URL_API}/facturas`, { headers: { Authorization: `bearer ${state.user.token} ` } })
         const res = await req.json()
         return res
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error.type)
         return { success: false, message: error }
       }
@@ -73,7 +73,7 @@ export default createStore({
         const req = await fetch(`${process.env.VUE_APP_URL_API}/saleDetail/${id}`, { headers: { Authorization: `bearer ${state.user.token} ` } })
         const res = await req.json()
         return res
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error.type)
         return { success: false, message: error }
       }
@@ -83,7 +83,7 @@ export default createStore({
         const req = await fetch(`${process.env.VUE_APP_URL_API}/boletaDetail/${id}`, { headers: { Authorization: `bearer ${state.user.token} ` } })
         const res = await req.json()
         return res
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error.type)
         return { success: false, message: error }
       }
@@ -93,7 +93,7 @@ export default createStore({
         const req = await fetch(`${process.env.VUE_APP_URL_API}/facturaDetail/${id}`, { headers: { Authorization: `bearer ${state.user.token} ` } })
         const res = await req.json()
         return res
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error.type)
         return { success: false, message: error }
       }
@@ -104,7 +104,7 @@ export default createStore({
         const req = await fetch(`${process.env.VUE_APP_URL_API}/pack_product/${id}`, { headers: { Authorization: `bearer ${state.user.token} ` } })
         const res = await req.json()
         return res
-      } catch (error:any) {
+      } catch (error: any) {
         return { data: null, success: true, message: error }
       }
     },
@@ -113,7 +113,7 @@ export default createStore({
         const req = await fetch(`${process.env.VUE_APP_URL_API}/user_roles`)
         const res = await req.json()
         return res
-      } catch (error:any) {
+      } catch (error: any) {
         return { success: true, message: error }
       }
     },
@@ -134,7 +134,7 @@ export default createStore({
           localStorage.token = res.data.token
         }
         return res
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error)
 
         return { success: false, message: error }
@@ -150,7 +150,7 @@ export default createStore({
         })
         const res = await req.json()
         return res
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error)
 
         return { success: false, message: error }
@@ -166,7 +166,7 @@ export default createStore({
         })
         const res = await req.json()
         return res
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error)
 
         return { success: false, message: error }
@@ -181,7 +181,7 @@ export default createStore({
           body: JSON.stringify(product)
 
         })
-        const res :any = await req.json()
+        const res: any = await req.json()
         if (res.success) {
           if (action === 'add') state.products.unshift(res.data)
           if (action === 'edit') {
@@ -197,7 +197,7 @@ export default createStore({
     },
     async savePackingProduct ({ state }, { action, data }) {
       console.log({ action })
-      data.packedProducts = data.packedProducts.map(({ id, productId, code, packing, measureUnit, priceBuy, priceSale, stock }:any) => ({
+      data.packedProducts = data.packedProducts.map(({ id, productId, code, packing, measureUnit, priceBuy, priceSale, stock }: any) => ({
         id,
         productId,
         code,
@@ -215,7 +215,7 @@ export default createStore({
           body: JSON.stringify(data)
 
         })
-        const res :any = await req.json()
+        const res: any = await req.json()
         // if (res.success) {
         //   if (action === 'add') state.products.unshift(res.data)
         //   if (action === 'edit') {
@@ -230,6 +230,9 @@ export default createStore({
       }
     },
     async printerTicket (_, { text, qrContent }) {
+      if (!text.includes('TICKET')) { text += '\n\n Consulte los detalle de su comprobante en:\n www.inversionesvilver.com/vilcherrez/comprobante/consultar' }
+      console.log(text)
+
       const req = await fetch(`${process.env.VUE_APP_URL_PRINTER}/printer/${localStorage.printer}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -254,7 +257,7 @@ export default createStore({
       return res
     },
     async getInfoDoc ({ state }, { typeDoc, document }) {
-      let req:any
+      let req: any
       console.log(typeDoc)
       if (typeDoc === 1) req = await fetch(`${process.env.VUE_APP_URL_API}/dni/${document}`, { headers: { Authorization: `bearer ${state.user.token} ` } })
       if (typeDoc === 6) req = await fetch(`${process.env.VUE_APP_URL_API}/ruc/${document}`, { headers: { Authorization: `bearer ${state.user.token} ` } })
@@ -328,6 +331,81 @@ export default createStore({
           })
 
         const res = await req.json()
+        return res
+      } catch (error) {
+        return { success: false, message: error }
+      }
+    },
+    async sendProofByEmail ({ state }: any, { dataProof, email }: any) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/sendProofByEmail`,
+          {
+            method: 'POST',
+            headers: { Authorization: `bearer ${state.user.token} ` },
+            body: JSON.stringify({ dataProof, email })
+          })
+
+        const res = await req.json()
+        return res
+      } catch (error) {
+        return { success: false, message: error }
+      }
+    },
+    async editUser ({ state }: any, { user }: any) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/user`,
+          {
+            method: 'PUT',
+            headers: { Authorization: `bearer ${state.user.token} ` },
+            body: JSON.stringify(user)
+          })
+
+        const res = await req.json()
+        return res
+      } catch (error) {
+        return { success: false, message: error }
+      }
+    },
+    async deleteUser ({ state }: any, { userId }: any) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/user/${userId}`,
+          {
+            method: 'DELETE',
+            headers: { Authorization: `bearer ${state.user.token} ` }
+          })
+
+        const res = await req.json()
+        return res
+      } catch (error) {
+        return { success: false, message: error }
+      }
+    },
+    async restoreUser ({ state }: any, { userId }: any) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/restoreUser/${userId}`,
+          {
+            method: 'POST',
+            headers: { Authorization: `bearer ${state.user.token} ` }
+          })
+
+        const res = await req.json()
+        return res
+      } catch (error) {
+        return { success: false, message: error }
+      }
+    },
+    async donwloadProofReports ({ state }: any, { dateFrom, dateTo }: any) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/proofReports`,
+          {
+            method: 'POST',
+            headers: { Authorization: `bearer ${state.user.token} ` },
+            body: JSON.stringify({
+              dateFrom, dateTo
+            })
+          })
+
+        const res = await req.blob()
         return res
       } catch (error) {
         return { success: false, message: error }

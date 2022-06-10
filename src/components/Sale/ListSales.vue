@@ -38,7 +38,7 @@
           <th>ID</th>
           <th>Cliente</th>
           <th>Documento Cliente</th>
-          <th>Fecha emision</th>
+          <th>Fecha de venta</th>
           <th>Importe Total</th>
           <th>Tipo de comprobante</th>
           <th></th>

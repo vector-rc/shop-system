@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "build": "vue-tsc --noEmit && vite build",
-    "dev": "vite",
+    "dev": "vite --host",
     "electron:build": "vue-cli-service electron:build",
     "electron:build:win": "vue-cli-service electron:build -- --win nsis",
     "electron:serve": "vue-cli-service electron:serve",
@@ -14,7 +14,7 @@
   "main": "background.js",
   "dependencies": {
     "jsbarcode": "^3.11.5",
-    "pdf-lib": "^1.17.1",
+    "jspdf": "^2.5.1",
     "vue": "^3.2.31",
     "vue-router": "^4.0.12",
     "vuex": "^4.0.0-0"
@@ -37,6 +37,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.2.0",
     "eslint-plugin-vue": "^8.4.0",
+    "sass": "^1.49.9",
     "standard": "^16.0.4",
     "typescript": "^4.4.4",
     "vite": "^2.7.2",

@@ -57,6 +57,44 @@
                 />
               </p>
             </div>
+               <div class="field is-horizontal" v-if="typeProof==='factura'">
+            <div class="field-body">
+              <div class="field has-addons">
+                <p class="control">
+                  <input
+                    class="input is-upper"
+                    placeholder="DEPARTAMENTO"
+                    v-model="client.address.departamento"
+                  />
+                </p>
+                <p class="control">
+                  <input
+                    class="input is-upper"
+                    placeholder="PROVINCIA"
+                    v-model="client.address.provincia"
+                  />
+                </p>
+                <p class="control">
+                  <input
+                    class="input is-upper"
+                    placeholder="DISTRITO"
+                    v-model="client.address.distrito"
+                  />
+                </p>
+              </div>
+            </div>
+
+          </div>
+          <div class="field" v-if="typeProof==='factura'">
+              <p class="control is-expanded">
+                <input
+                  class="input"
+                  placeholder="DIRECCION"
+                  type="text"
+                  v-model="client.address.direccion"
+                />
+              </p>
+            </div>
           <div class="field" v-if="typeProof==='factura'">
               <p class="control is-expanded">
                 <input
@@ -73,7 +111,7 @@
       <footer class="modal-card-foot">
         <button :disabled="loading" @click="validateClient()" class="button is-success">Guardar e Imprimir {{typeProof}}</button>
         <!-- <button :disabled="loading" @click="validateClient()" class="button is-success">Solo guardar {{typeProof}}</button> -->
-        <button @click="emit('hide')" class="button">Cancelar</button>
+        <button @click="emit('hide'),resetForm()" class="button">Cancelar</button>
       </footer>
     </div>
   </div>
@@ -98,7 +136,8 @@ const documentTypes = [
   { code: 1, name: 'DNI', length: 8 },
   { code: 4, name: 'CARNET DE EXTRANGERIA', length: 12 },
   { code: 6, name: 'RUC', length: 11 },
-  { code: 7, name: 'PASAPORTE', length: 12 }
+  { code: 7, name: 'PASAPORTE', length: 12 },
+  { code: 0, name: 'SIN DOCUMENTO', length: 0 }
 ]
 
 const client = reactive(props.client as any)
@@ -108,18 +147,38 @@ watchEffect(() => {
 })
 
 watchEffect(() => {
-  loading.value = props.loading
+  client.name = client.name.toLocaleUpperCase()
 })
 
 watchEffect(() => {
+  loading.value = props.loading
+})
+
+const resetForm = () => {
+  typeProof.value = 'boleta'
   client.documentType = 1
   client.document = ''
   client.name = ''
   client.email = ''
+  client.address = ''
+  client.address = {
+    departamento: '',
+    provincia: '',
+    distrito: '',
+    direccion: '',
+    ubigeo: ''
+  }
+}
+
+watchEffect(() => {
+  if (!show.value) {
+    resetForm()
+  }
+})
+
+watchEffect(() => {
   if (typeProof.value === 'factura') {
     client.documentType = 6
-    client.document = ''
-    client.name = ''
   }
 })
 
@@ -138,13 +197,39 @@ const getInfoDoc = async () => {
     toast.warning('Este numero de ' + documentType.value.name + ' no existe')
     return
   }
+  if (infoClient.name) {
+    client.name = infoClient.name
+    client.email = infoClient.email
+    client.address = infoClient.address ?? {
+      departamento: '-',
+      provincia: '-',
+      distrito: '-',
+      direccion: '-',
+      ubigeo: '-'
+    }
+    return
+  }
   client.name = infoClient.nombre
+  client.email = infoClient.email ?? ''
+  client.address =
+   {
+     departamento: !infoClient.departamento ? '-' : infoClient.departamento,
+     provincia: !infoClient.provincia ? '-' : infoClient.provincia,
+     distrito: !infoClient.distrito ? '-' : infoClient.distrito,
+     direccion: !infoClient.direccion ? '-' : infoClient.direccion,
+     ubigeo: !infoClient.ubigeo ? '-' : infoClient.ubigeo
+   }
+  console.log(JSON.stringify(client.address))
 }
 
 const validateClient = () => {
   if (typeProof.value !== 'ticket') {
-    if (client.document === '' || client.name === '') {
-      toast.warning('El documento o el nombre no puede ser vacio')
+    if (client.name === '') {
+      toast.warning('El nombre no puede ser vacio')
+      return
+    }
+    if (client.documentType !== 0 && client.name === '') {
+      toast.warning('El documento no puede ser vacio')
       return
     }
 

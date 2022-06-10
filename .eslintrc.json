@@ -15,6 +15,7 @@
   "rules": {
     "vue/no-multiple-template-root": "off",
     "vue/no-mutating-props": "off",
-    "no-useless-escape": "off"
+    "no-useless-escape": "off",
+    "no-var": "off"
   }
 }

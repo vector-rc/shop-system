@@ -71,6 +71,8 @@ const productsFilter = ref([] as any[])
 const querySearch = ref('')
 
 onMounted(async () => {
+  console.log(store.state.user)
+
   products.value = store.state.products
   productsFilter.value = store.state.products
 })

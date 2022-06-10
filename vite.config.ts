@@ -18,6 +18,7 @@ export default () => {
         '@': path.resolve(__dirname, './src')
       }
     },
+    base: '/vilcherrez/',
     optimizeDeps: {
       exclude: ['dist_electron/bundled/*']
     }

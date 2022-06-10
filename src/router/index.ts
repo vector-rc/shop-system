@@ -11,6 +11,7 @@ import ViewProfile from '../views/ViewProfile.vue'
 import NewSale from '../components/Sale/NewSale.vue'
 import NewProduct from '../components/Product/WriteProduct.vue'
 import ListUsers from '../components/User/ListUsers.vue'
+import ViewReports from '../views/ViewReports.vue'
 
 import store from '../store'
 
@@ -71,14 +72,14 @@ const routes = [
     component: ViewBarcodes
   },
   {
-    path: '/proofPayments',
-    name: 'proofPayments',
-    component: ViewProofPayments
-  },
-  {
     path: '/comprobante/:encodeData',
     name: 'comprobante',
     component: ViewProofPayments
+  },
+  {
+    path: '/reports',
+    name: 'reports',
+    component: ViewReports
   }
 
 ]

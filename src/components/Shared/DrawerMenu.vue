@@ -105,6 +105,14 @@
         <hr>
         <ul class="menu-list">
              <li>
+                <router-link to="/reports">
+                    <icon size="20">
+                        <DocumentBulletList20Regular />
+                    </icon>
+                    <span>Reportes</span>
+                </router-link>
+            </li>
+             <li>
                 <router-link to="/printers">
                     <icon size="20">
                         <Settings20Filled />
@@ -113,11 +121,11 @@
                 </router-link>
             </li>
             <li>
-                <router-link to="/proofPayments">
+                <router-link to="/comprobante/consultar">
                     <icon size="20">
-                        <BarcodeScanner20Filled />
+                        <DocumentBulletList20Regular />
                     </icon>
-                    <span>Resumemnes</span>
+                    <span>Consultar Comprobantes</span>
                 </router-link>
             </li>
             <li>
@@ -134,7 +142,7 @@
 
 <script setup lang="ts">
 import { Icon } from '@vicons/utils'
-import { BoxMultiple20Filled, Cart20Filled, ShoppingBag20Filled, BarcodeScanner20Filled, Settings20Filled, People20Filled, AppsAddIn20Filled, PersonAdd20Filled } from '@vicons/fluent'
+import { BoxMultiple20Filled, Cart20Filled, ShoppingBag20Filled, BarcodeScanner20Filled, Settings20Filled, People20Filled, AppsAddIn20Filled, PersonAdd20Filled, DocumentBulletList20Regular } from '@vicons/fluent'
 
 </script>
 

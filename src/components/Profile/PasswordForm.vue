@@ -50,7 +50,7 @@
         <div class="control">
           <button
             class="button is-primary"
-            :class="{'isLoading':isLoading}"
+            :class="{'is-loading':isLoading}"
           >
             Cambiar contraseña
           </button>
@@ -92,9 +92,11 @@ const submit = async () => {
   const res = await store.dispatch('changePassword', form)
   if (!res.success) {
     toast.danger(res.message, 4000)
+    isLoading.value = false
     return
   }
   toast.success(res.message, 4000)
   formPass.value.reset()
+  isLoading.value = false
 }
 </script>

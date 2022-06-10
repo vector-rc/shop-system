@@ -123,7 +123,14 @@ const client = reactive({
   documentType: 1,
   document: '0',
   name: '',
-  email: ''
+  email: '',
+  address: {
+    departamento: '-',
+    provincia: '-',
+    distrito: '-',
+    direccion: '-',
+    ubigeo: '-'
+  }
 })
 
 const previewPrinter = computed(() => {
@@ -173,6 +180,7 @@ ID Venta: 0000546-5s654-sds645-sds65
 
 DNI Cliente:${client.document}
 Nombre Cliente:${client.name}
+Direccion: ${client.address.direccion}
 ${textPrinter.value}
                  Subtotal:           S/${Math.round((totalMount.value * (100 / 118) + Number.EPSILON) * 10) / 10}
                  IGV(18%):           S/${Math.round((totalMount.value * (18 / 118) + Number.EPSILON) * 10) / 10}
@@ -217,6 +225,7 @@ ID Venta: 00000${sale.id}
 CLIENTE:
 Documento: ${client.document}
 Nombre: ${client.name}
+Direccion: ${!client.address ? '------------------' : client.address.direccion}
 `
   }
 
@@ -348,38 +357,42 @@ const printer = async () => {
 
 const saveSale = async (typeProof: any) => {
   // @ts-check console.log({ soldProducts: itemsCart.value, client, typeProof })
-  loadingNewSale.value = true
-
-  const saleData = await store.dispatch('saveSale', { soldProducts: itemsCart.value, client, typeProof })
   let r: string = ''
   let qrContent = ''
+  loadingNewSale.value = true
+  try {
+    const saleData = await store.dispatch('saveSale', { soldProducts: itemsCart.value, client, typeProof })
 
-  if (typeProof !== 'ticket') {
+    if (typeProof !== 'ticket') {
     // if (saleData.proof.status !== 'ACEPTADA') {
     //   msgValue.value = saleData.proof.description
     //   showMsg.value = true
     //   setTimeout(() => { showMsg.value = false }, 3000)
     // } else {
-    const proof = saleData.proof.data
-    r = renderBoucher(saleData.legend, typeProof, saleData.sale, saleData.client, proof)
-    qrContent = `20605808931|${typeProof.value === 'boleta' ? '03' : '01'}|${proof.value.serie}|${buildCorrelative(proof.correlative)}|${Math.round((saleData.sale.total * (18 / 118) + Number.EPSILON) * 10) / 10}|${saleData.sale.total}|${proof.value.dateTime.slice(0, 10)}|0${saleData.client.documentType}|${saleData.client.document}`
+      const proof = saleData.proof.data
+      r = renderBoucher(saleData.legend, typeProof, saleData.sale, saleData.client, proof)
+      qrContent = `20605808931|${typeProof.value === 'boleta' ? '03' : '01'}|${proof.serie}|${buildCorrelative(proof.correlative)}|${Math.round((saleData.sale.total * (18 / 118) + Number.EPSILON) * 10) / 10}|${saleData.sale.total}|${proof.dateTime.slice(0, 10)}|0${saleData.client.documentType}|${saleData.client.document}`
 
     // }
-  } else {
-    r = renderBoucher(saleData.legend, typeProof, saleData.sale, saleData.client, [])
-  }
-  console.log(r)
-  try {
-    r = r.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    } else {
+      r = renderBoucher(saleData.legend, typeProof, saleData.sale, saleData.client, [])
+    }
+    console.log(r)
+    try {
+      r = r.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
 
-    await store.dispatch('printerTicket', { text: r, qrContent })
-    loadingNewSale.value = false
+      await store.dispatch('printerTicket', { text: r, qrContent })
+      loadingNewSale.value = false
+    } catch (error) {
+      loadingNewSale.value = false
+      toast.warning('La venta se ha registrado exitosamente, pero no se ha podido imprimir por que la impresora esta apagada o el controlador esta desactivado', 6000)
+    }
   } catch (error) {
-    loadingNewSale.value = false
-    toast.warning('La venta se ha registrado exitosamente, pero no se ha podido imprimir por que la impresora esta apagada o el controlador esta desactivado', 6000)
+    toast.warning('Ocurrio un error al guardar la venta', 6000)
   } finally {
-    reset()
+    loadingNewSale.value = false
     showModal.value = false
+    reset()
   }
 }
 
