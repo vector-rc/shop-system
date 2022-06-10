@@ -1,3 +1,6 @@
+import { round } from './roundDecimal'
+import { getCurrencySymbolByIso } from '@/utils/currencies'
+
 const buildSpaces = (n: Number) => {
   if (n <= 0) return ''
   let spaces = ''
@@ -7,7 +10,7 @@ const buildSpaces = (n: Number) => {
   return spaces
 }
 
-const createTable = (products: Array<any>) => {
+const createTable = (products: Array<any>, currency:string) => {
   let firstline = ''
   let secondline = ''
   let textTable = '\n------------------------------------------------\n'
@@ -15,12 +18,14 @@ const createTable = (products: Array<any>) => {
   textTable += '------------------------------------------------\n'
 
   products.forEach((el: any) => {
+    if (!el.price) el.price = el.priceSale
+
     firstline = el.name.slice(0, 24) + buildSpaces(24 - el.name.length)
     firstline += '  '
     firstline += '' + el.quantity + buildSpaces(3 - ('' + el.quantity).length)
-    firstline += ' S/'
-    firstline += '' + el.priceSale + buildSpaces(6 - ('' + el.priceSale).length)
-    firstline += ' S/'
+    firstline += ` ${getCurrencySymbolByIso(currency)}`
+    firstline += '' + el.price + buildSpaces(6 - ('' + el.price).length)
+    firstline += ` ${getCurrencySymbolByIso(currency)}`
     firstline += '' + el.mount + buildSpaces(7 - ('' + el.mount).length)
     textTable += `${firstline}\n`
     if (el.name.length > 24) {
@@ -37,7 +42,7 @@ const createTable = (products: Array<any>) => {
   return textTable
 }
 
-const buildCorrelative = (correlative: number) => {
+export const buildCorrelative = (correlative: number) => {
   let zeros = ''
   for (let i = 0; i < 8 - correlative.toString().length; i++) {
     zeros += '0'
@@ -71,12 +76,12 @@ Direccion: ${!client.address ? '------------------' : client.address.direccion}
 `
   }
 
-  content += createTable(soldProducts)
+  content += createTable(soldProducts, sale.currencyType)
   content += `
-                OP.GRAVADAS:        S/ ${Math.round((sale.total * (100 / 118) + Number.EPSILON) * 10) / 10}
-                   IGV(18%):        S/ ${Math.round((sale.total * (18 / 118) + Number.EPSILON) * 10) / 10}
-                 DESCUENTOS:        S/ -0.00
-              IMPORTE TOTAL:        S/ ${sale.total}
+                OP.GRAVADAS:        ${getCurrencySymbolByIso(sale.currencyType)} ${round(sale.total * (100 / 118), 2)}
+                   IGV(18%):        ${getCurrencySymbolByIso(sale.currencyType)} ${round(sale.total * (18 / 118), 2)}
+                 DESCUENTOS:        ${getCurrencySymbolByIso(sale.currencyType)} -0.00
+              IMPORTE TOTAL:        ${getCurrencySymbolByIso(sale.currencyType)} ${sale.total}
 ------------------------------------------------ 
 ${legend}
 
@@ -112,3 +117,23 @@ export const previewPrinter = (renderedProof:string) => {
   </html>
   `
 }
+
+// const print = async () => {
+//   waitingPrint.value = true
+
+//   let r = renderBoucher(legend.value, typeProof.value, sale.value, client.value, proof.value, soldProducts.value)
+//   try {
+//     r = r.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+//     console.log(r)
+//     let qrContent = ''
+//     if (typeProof.value !== 'ticket') {
+//       qrContent = `20605808931|${typeProof.value === 'boleta' ? '03' : '01'}|${proof.value.serie}|${buildCorrelative(proof.value.correlative)}|${Math.round((sale.value.total * (18 / 118) + Number.EPSILON) * 10) / 10}|${sale.value.total}|${proof.value.dateTime.slice(0, 10)}|0${client.value.documentType}|${client.value.document}`
+//     }
+//     await store.dispatch('printerTicket', { text: r, qrContent })
+//     waitingPrint.value = false
+//     // emit('hide')
+//   } catch (error) {
+//     waitingPrint.value = false
+//     toast.danger('No se ha podido imprimir por que la impresora esta apagada o el controlador esta desactivado', 3000)
+//   }
+// }
