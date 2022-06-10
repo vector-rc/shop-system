@@ -45,7 +45,7 @@ const buildCorrelative = (correlative: number) => {
   return zeros + correlative.toString()
 }
 
-const renderBoucher = (legend: string, typeProof: string, sale: any, client: any, proof: any = []) => {
+export const renderBoucher = (legend: string, typeProof: string, sale: any, client: any, proof: any = [], soldProducts:Array<any>) => {
   let content = `
     INVERSIONES VILVER E.I.R.L - RUC 20605808931
       Jr. Grau Nro. 1032 Cajamarca-Cajabamba  `
@@ -71,7 +71,7 @@ Direccion: ${!client.address ? '------------------' : client.address.direccion}
 `
   }
 
-  content += createTable(itemsCart.value)
+  content += createTable(soldProducts)
   content += `
                 OP.GRAVADAS:        S/ ${Math.round((sale.total * (100 / 118) + Number.EPSILON) * 10) / 10}
                    IGV(18%):        S/ ${Math.round((sale.total * (18 / 118) + Number.EPSILON) * 10) / 10}
@@ -87,7 +87,7 @@ ${legend}
   return content
 }
 
-const previewPrinter = (proof) => {
+export const previewPrinter = (renderedProof:string) => {
   return `
   <html>
   <head>
@@ -106,7 +106,7 @@ const previewPrinter = (proof) => {
   <body>
  
   <pre >
-      ${proof}
+      ${renderedProof}
   </pre>
   </body>
   </html>

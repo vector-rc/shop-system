@@ -321,7 +321,7 @@ onMounted(async () => {
   try {
     await store.dispatch('fetchProducts')
     const req = await fetch('http://localhost:5050/devices')
-    const res = await req.json()
+    await req.json()
   } catch (error) {
     toast.danger('No se encuentra el controlador de la impresora por favor inicie el controlador y configure la impresora')
   }
@@ -339,21 +339,21 @@ const codeScan = () => {
     }
   }, 100)
 }
-const printer = async () => {
-  console.log(ticket.value)
+// const printer = async () => {
+//   console.log(ticket.value)
 
-  if (itemsCart.value.length === 0) return
+//   if (itemsCart.value.length === 0) return
 
-  // const w = window.open(
-  //   '',
-  //   'Boleta de venta',
-  //   'location=yes,height=570,width=520,scrollbars=yes,status=yes,centerscreen'
-  // )
-  // w?.document.write('')
-  // w?.document.write(previewPrinter.value)
-  store.dispatch('printerTicket', { text: ticket.value })
-  // store.dispatch('testEncode', { text: textPrinter.value })
-}
+//   // const w = window.open(
+//   //   '',
+//   //   'Boleta de venta',
+//   //   'location=yes,height=570,width=520,scrollbars=yes,status=yes,centerscreen'
+//   // )
+//   // w?.document.write('')
+//   // w?.document.write(previewPrinter.value)
+//   store.dispatch('printerTicket', { text: ticket.value })
+//   // store.dispatch('testEncode', { text: textPrinter.value })
+// }
 
 const saveSale = async (typeProof: any) => {
   // @ts-check console.log({ soldProducts: itemsCart.value, client, typeProof })

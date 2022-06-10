@@ -12,7 +12,7 @@
                 href="#"
                 class="card-header-icon"
                 aria-label="more options"
-                @click.prevent="emit('headerIconClick')"
+                @click.prevent="emit('header-icon-click')"
             >
                 <Icon size="25">
                     <component v-if="props.headerIcon" :is="props.headerIcon" />
@@ -25,7 +25,7 @@
     </div>
 </template>
 
-<script setup >
+<script setup lang="ts" >
 import { Icon } from '@vicons/utils'
 
 const props = defineProps({
@@ -34,7 +34,7 @@ const props = defineProps({
     default: null
   },
   icon: {
-    type: String,
+    type: [Object, String],
     default: null
   },
   headerIcon: {

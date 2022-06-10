@@ -41,7 +41,7 @@
           <!-- <td>{{ product.id}}|pi:{{ product.productId}}</td> -->
           <td v-html="resaltWords(querySearch.split(' '),product.code)"></td>
           <td style="cursor:copy" @click="copyProduct(product)" v-html="resaltWords(querySearch.split(' '),product.name)"></td>
-          <td>S/.{{ product.priceSale }}</td>
+          <td :style="{'color': product.priceSale?'':'red'}">S/.{{ product.priceSale }}</td>
           <td>{{ product.stock }}</td>
           <td >
             <button class="button is-info is-small" @click="editProduct(product),emit('editProduct',product.productId)">

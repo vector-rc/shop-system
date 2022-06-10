@@ -183,11 +183,13 @@ function base64ToUtf8 (str: string) {
 }
 
 const generatePdf = () => {
+  /* eslint-disable */
   const pdf = new jspdf({
     orientation: 'p',
     unit: 'pt',
     format: 'a4'
   })
+  /* eslint-disable */
   // pdf.addFont()
   // pdf.setFont('Helvetica')
   console.log(pdf.getFontList())
