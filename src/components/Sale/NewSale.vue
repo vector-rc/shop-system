@@ -216,13 +216,13 @@ const codeScan = () => {
 //   // store.dispatch('testEncode', { text: textPrinter.value })
 // }
 
-const saveSale = async (typeProof: any) => {
+const saveSale = async ({ typeProof, currency }:any) => {
   // @ts-check console.log({ soldProducts: itemsCart.value, client, typeProof })
   let r: string = ''
   let qrContent = ''
   loadingNewSale.value = true
   try {
-    const saleData = await store.dispatch('saveSale', { soldProducts: itemsCart.value, client, typeProof })
+    const saleData = await store.dispatch('saveSale', { soldProducts: itemsCart.value, client, typeProof, currency })
 
     if (typeProof !== 'ticket') {
     // if (saleData.proof.status !== 'ACEPTADA') {

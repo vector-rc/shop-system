@@ -8,9 +8,12 @@
         <button class="delete" aria-label="close" @click="emit('hide')"></button>
       </header>
       <section class="modal-card-body">
-        <label for="ticket" class="button" :class="{'is-primary':(typeProof === 'ticket')}">Ticket</label>
-        <label for="boleta" class="button" :class="{'is-primary':(typeProof === 'boleta')}">Boleta</label>
-        <label for="factura" class="button" :class="{'is-primary':(typeProof === 'factura')}">Factura</label>
+        <div style="display:flex">
+          <label for="ticket" class="button" :class="{ 'is-primary': (typeProof === 'ticket') }">Ticket</label>
+          <label for="boleta" class="button" :class="{ 'is-primary': (typeProof === 'boleta') }">Boleta</label>
+          <label for="factura" class="button" :class="{ 'is-primary': (typeProof === 'factura') }">Factura</label>
+
+        </div>
 
         <div style="display: none;">
           <input type="radio" v-model="typeProof" id="boleta" value="boleta" />
@@ -24,94 +27,79 @@
               <div class="field has-addons">
                 <p class="control">
                   <span class="select">
-                    <select v-model="client.documentType" :disabled="typeProof==='factura'">
-                      <option
-                        v-for="doc in documentTypes"
-                        :key="doc.code"
-                        :value="doc.code"
-                      >{{ doc.name }}</option>
+                    <select v-model="client.documentType" :disabled="typeProof === 'factura'">
+                      <option v-for="doc in documentTypes" :key="doc.code" :value="doc.code">{{ doc.name }}</option>
                     </select>
                   </span>
                 </p>
                 <p class="control">
-                  <input
-                    class="input is-upper"
-                    :placeholder="documentType.name"
-                    @input="validate(),getInfoDoc()"
-                    v-model="client.document"
-                  />
+                  <input class="input is-upper" :placeholder="documentType.name" @input="validate(), getInfoDoc()"
+                    v-model="client.document" />
                 </p>
               </div>
             </div>
-
           </div>
-          <div class="field">
-              <p class="control is-expanded">
-                <input
-                  class="input is-upper"
-                  placeholder="nombre"
-                  type="text"
-                  v-model="client.name"
-                  :disabled="client.documentType===6 || client.documentType===1"
 
-                />
-              </p>
-            </div>
-               <div class="field is-horizontal" v-if="typeProof==='factura'">
+              <div class="field is-horizontal">
             <div class="field-body">
               <div class="field has-addons">
                 <p class="control">
-                  <input
-                    class="input is-upper"
-                    placeholder="DEPARTAMENTO"
-                    v-model="client.address.departamento"
-                  />
+                  <span class="input">
+                    MONEDA
+                  </span>
+                </p>
+                <div class="control">
+                  <span class="select">
+                    <select v-model="typeCurrency">
+                      <option v-for="curr in currencies" :key="curr.ISOCode" :value="curr.ISOCode">{{ curr.name }}
+                      </option>
+                    </select>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <p class="control is-expanded">
+              <input class="input is-upper" placeholder="nombre" type="text" v-model="client.name"
+                :disabled="client.documentType === 6 || client.documentType === 1" />
+            </p>
+          </div>
+          <div class="field is-horizontal" v-if="typeProof === 'factura'">
+            <div class="field-body">
+              <div class="field has-addons">
+                <p class="control">
+                  <input class="input is-upper" placeholder="DEPARTAMENTO" v-model="client.address.departamento" />
                 </p>
                 <p class="control">
-                  <input
-                    class="input is-upper"
-                    placeholder="PROVINCIA"
-                    v-model="client.address.provincia"
-                  />
+                  <input class="input is-upper" placeholder="PROVINCIA" v-model="client.address.provincia" />
                 </p>
                 <p class="control">
-                  <input
-                    class="input is-upper"
-                    placeholder="DISTRITO"
-                    v-model="client.address.distrito"
-                  />
+                  <input class="input is-upper" placeholder="DISTRITO" v-model="client.address.distrito" />
                 </p>
               </div>
             </div>
 
           </div>
-          <div class="field" v-if="typeProof==='factura'">
-              <p class="control is-expanded">
-                <input
-                  class="input"
-                  placeholder="DIRECCION"
-                  type="text"
-                  v-model="client.address.direccion"
-                />
-              </p>
-            </div>
-          <div class="field" v-if="typeProof==='factura'">
-              <p class="control is-expanded">
-                <input
-                  class="input"
-                  placeholder="Email"
-                  type="text"
-                  v-model="client.email"
-                />
-              </p>
-            </div>
+          <div class="field" v-if="typeProof === 'factura'">
+            <p class="control is-expanded">
+              <input class="input" placeholder="DIRECCION" type="text" v-model="client.address.direccion" />
+            </p>
+          </div>
+          <div class="field" v-if="typeProof === 'factura'">
+            <p class="control is-expanded">
+              <input class="input" placeholder="Email" type="text" v-model="client.email" />
+            </p>
+          </div>
         </div>
 
       </section>
       <footer class="modal-card-foot">
-        <button :disabled="loading" @click="validateClient()" class="button is-success">Guardar e Imprimir {{typeProof}}</button>
+        <button :disabled="loading" @click="validateClient()" class="button is-success">Guardar e Imprimir
+          {{ typeProof }}</button>
         <!-- <button :disabled="loading" @click="validateClient()" class="button is-success">Solo guardar {{typeProof}}</button> -->
-        <button @click="emit('hide'),resetForm()" class="button">Cancelar</button>
+        <button @click="emit('hide'), resetForm()" class="button">Cancelar</button>
       </footer>
     </div>
   </div>
@@ -121,6 +109,7 @@
 import { ref, watchEffect, reactive, computed } from 'vue'
 import { useStore } from 'vuex'
 import { toast } from '@/utils/toast.js'
+import { currencies } from '@/utils/currencies'
 
 const store = useStore()
 
@@ -131,6 +120,7 @@ const show = ref(props.show)
 const loading = ref(props.loading)
 
 const typeProof = ref('ticket')
+const typeCurrency = ref('PEN')
 
 const documentTypes = [
   { code: 1, name: 'DNI', length: 8 },
@@ -212,13 +202,13 @@ const getInfoDoc = async () => {
   client.name = infoClient.nombre
   client.email = infoClient.email ?? ''
   client.address =
-   {
-     departamento: !infoClient.departamento ? '-' : infoClient.departamento,
-     provincia: !infoClient.provincia ? '-' : infoClient.provincia,
-     distrito: !infoClient.distrito ? '-' : infoClient.distrito,
-     direccion: !infoClient.direccion ? '-' : infoClient.direccion,
-     ubigeo: !infoClient.ubigeo ? '-' : infoClient.ubigeo
-   }
+  {
+    departamento: !infoClient.departamento ? '-' : infoClient.departamento,
+    provincia: !infoClient.provincia ? '-' : infoClient.provincia,
+    distrito: !infoClient.distrito ? '-' : infoClient.distrito,
+    direccion: !infoClient.direccion ? '-' : infoClient.direccion,
+    ubigeo: !infoClient.ubigeo ? '-' : infoClient.ubigeo
+  }
   console.log(JSON.stringify(client.address))
 }
 
@@ -241,7 +231,7 @@ const validateClient = () => {
     }
   }
 
-  emit('save', typeProof.value)
+  emit('save', { typeProof: typeProof.value, currency: typeCurrency.value })
 }
 
 const validate = () => {

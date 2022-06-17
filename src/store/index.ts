@@ -265,7 +265,7 @@ export default createStore({
       const res = await req.json()
       return res.data
     },
-    async saveSale ({ state }, { soldProducts, client, typeProof }) {
+    async saveSale ({ state }, { soldProducts, client, typeProof, currency }) {
       const req = await fetch(`${process.env.VUE_APP_URL_API}/sale`,
         {
           method: 'POST',
@@ -274,7 +274,8 @@ export default createStore({
             soldProducts,
             client,
             userId: state.user.id,
-            typeProof
+            typeProof,
+            currency
           })
         })
 
