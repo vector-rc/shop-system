@@ -54,7 +54,7 @@
           <td>{{ sale.clientName }}</td>
           <td>{{ sale.clientDocument }}</td>
           <td>{{ sale.dateTime }}</td>
-          <td>{{getCurrencySymbolByIso(sale.currencyType)}} {{ sale.total }}</td>
+          <td>{{getCurrencySymbolByIso(sale.currency)}} {{ sale.total }}</td>
           <td>
             <span class="tag is-primary">{{ getProofType(sale.proofType) }}</span>
             <span v-if=" sale.enable === 0 || sale.status===3 || sale.status===5" class="tag is-danger">ANULADO</span>

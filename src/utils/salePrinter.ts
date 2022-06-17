@@ -76,12 +76,12 @@ Direccion: ${!client.address ? '------------------' : client.address.direccion}
 `
   }
 
-  content += createTable(soldProducts, sale.currencyType)
+  content += createTable(soldProducts, sale.currency)
   content += `
-                OP.GRAVADAS:        ${getCurrencySymbolByIso(sale.currencyType)} ${round(sale.total * (100 / 118), 2)}
-                   IGV(18%):        ${getCurrencySymbolByIso(sale.currencyType)} ${round(sale.total * (18 / 118), 2)}
-                 DESCUENTOS:        ${getCurrencySymbolByIso(sale.currencyType)} -0.00
-              IMPORTE TOTAL:        ${getCurrencySymbolByIso(sale.currencyType)} ${sale.total}
+                OP.GRAVADAS:        ${getCurrencySymbolByIso(sale.currency)} ${round(sale.total * (100 / 118), 2)}
+                   IGV(18%):        ${getCurrencySymbolByIso(sale.currency)} ${round(sale.total * (18 / 118), 2)}
+                 DESCUENTOS:        ${getCurrencySymbolByIso(sale.currency)} -0.00
+              IMPORTE TOTAL:        ${getCurrencySymbolByIso(sale.currency)} ${sale.total}
 ------------------------------------------------ 
 ${legend}
 

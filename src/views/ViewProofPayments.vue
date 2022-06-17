@@ -233,7 +233,7 @@ const consultar = async (fieldsProof = '') => {
 
   soldProducts.value = resData.data.soldProducts
   sale.value = resData.data.sale
-  currencySymbol.value = getCurrencySymbolByIso(sale.value.currencyType)
+  currencySymbol.value = getCurrencySymbolByIso(sale.value.currency)
 
   client.value = resData.data.client
   if (!client.value)client.value = {}

@@ -151,13 +151,13 @@
             <tr v-for="product of soldProducts" :key="product.id">
               <td>{{ product.code }}</td>
               <td>{{ product.name }}</td>
-              <td>{{getCurrencySymbolByIso(sale.currencyType)}} {{ product.price }}</td>
+              <td>{{getCurrencySymbolByIso(sale.currency)}} {{ product.price }}</td>
               <td>{{ product.quantity }}</td>
-              <td>{{getCurrencySymbolByIso(sale.currencyType)}} {{ product.mount }}</td>
+              <td>{{getCurrencySymbolByIso(sale.currency)}} {{ product.mount }}</td>
             </tr>
             <tr>
               <th colspan="4" style="text-align: right">TOTAL:</th>
-              <th>{{getCurrencySymbolByIso(sale.currencyType)}} {{ totalMount }}</th>
+              <th>{{getCurrencySymbolByIso(sale.currency)}} {{ totalMount }}</th>
             </tr>
           </tbody>
         </table>
