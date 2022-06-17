@@ -24,7 +24,7 @@
           </div>
           <div>
             <p class="control is-expanded">
-              <button class="button is-primary input mt-2">Iniciar Sesion</button>
+              <button class="button is-primary input mt-2" :class="{'is-loading':loginLoading}" :disabled="loginLoading" >Iniciar Sesion</button>
               <span v-if="error" class="help is-danger">Error al iniciar session</span>
             </p>
           </div>
@@ -47,6 +47,7 @@ import wallpapers from '@/utils/wallpapers'
 import { Icon } from '@vicons/utils'
 
 const bg = ref({})
+const loginLoading = ref(false)
 
 // const wallpaperGallerys = [
 //   'https://imgur.com/gallery/wCBYO.json',
@@ -78,6 +79,7 @@ onMounted(async () => {
 })
 
 const login = async () => {
+  loginLoading.value = true
   const res = await store.dispatch('userLogin', { credentials })
 
   error.value = !res.success
@@ -90,6 +92,7 @@ const login = async () => {
 
     router.replace('products')
   }
+  loginLoading.value = false
   console.log(res.message)
 }
 </script>
