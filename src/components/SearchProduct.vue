@@ -38,21 +38,17 @@ onMounted(async () => {
 
 const resaltWords = (text:string) => {
   const words = querySearch.value.split(' ')
-  if (words.length === 0) return
+  if (words.length === 0) return text
   words.forEach(w => {
     w = w.toString().replaceAll(/[\[\]\/]/ig, '')
     text = text.toString().toLocaleUpperCase().replace(w.toLocaleUpperCase(), `[]${w.toLocaleUpperCase()}[/]`)
   })
-  text = text.toString().replace('[]', '<span style="background:#6eeeeebb">')
-  text = text.toString().replace('[/]', '</span>')
+  text = text.toString().replaceAll('[]', '<span style="background:#6eeeeebb">')
+  text = text.toString().replaceAll('[/]', '</span>')
   return text
 }
 
 const filterProducts = () => {
-  if (querySearch.value === '') {
-    productsFilter.value = []
-    return
-  }
   const beforeQuery = querySearch.value
   setTimeout(() => {
     if (beforeQuery === querySearch.value) {
@@ -71,7 +67,6 @@ const filterProducts = () => {
           tempProductsFilter.push(p)
         }
       })
-      console.log(tempProductsFilter)
 
       productsFilter.value = tempProductsFilter.sort((a, b) => b.matchs - a.matchs).slice(0, 15)
     }

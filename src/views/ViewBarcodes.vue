@@ -56,7 +56,6 @@ const generatePdf = () => {
 
 const selectItem = (p: any) => {
   product.value = p
-  console.log(p.code)
 }
 </script>
 

@@ -229,11 +229,23 @@ export default createStore({
 
       }
     },
+    async deleteProduct ({ state }, { productId }) {
+      try {
+        const req = await fetch(`${process.env.VUE_APP_URL_API}/product/${productId}`, {
+          method: 'DELETE',
+          headers: { Authorization: `bearer ${state.user.token} ` }
+        })
+        const res: any = await req.json()
+        return res
+      } catch (error) {
+        return { success: false, message: 'Ocurrio un error al eliminar el producto' }
+      }
+    },
     async printerTicket (_, { text, qrContent }) {
       if (!text.includes('TICKET')) { text += '\n\n Consulte los detalle de su comprobante en:\n www.inversionesvilver.com/vilcherrez/comprobante/consultar' }
       console.log(text)
 
-      const req = await fetch(`${process.env.VUE_APP_URL_PRINTER}/printer/${localStorage.printer}`, {
+      const req:any = await fetch(`${process.env.VUE_APP_URL_PRINTER}/printer/${localStorage.printer}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

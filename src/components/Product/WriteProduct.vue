@@ -1,4 +1,20 @@
 <template>
+  <div class="modal is-active" v-if="showModalDelete">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head has-background-danger">
+        <p class="modal-card-title has-text-white has-text-weight-bold">Advertencia</p>
+        <button class="delete" aria-label="close" @click="showModalDelete = false"></button>
+      </header>
+      <section class="modal-card-body">¿Esta seguro de eliminar este producto? Una vez eliminado ya no se podra
+        recuperar</section>
+      <footer class="modal-card-foot">
+        <button @click="deleteProduct()" class="button is-danger" :class="{ 'is-loading': deleting }"
+          :disabled="deleting">Eliminar</button>
+        <button @click="showModalDelete = false" class="button">Cancelar</button>
+      </footer>
+    </div>
+  </div>
   <div class="modal is-active" v-if="showModal">
     <div class="modal-background"></div>
     <div class="modal-card">
@@ -6,70 +22,54 @@
         <p class="modal-card-title">Advertencia</p>
         <button class="delete" aria-label="close" @click="showModal = false"></button>
       </header>
-      <section
-        class="modal-card-body"
-      >Algunos codigos estan vacios, ¿quiere guardar de todas formas?</section>
+      <section class="modal-card-body">Algunos codigos estan vacios, ¿quiere guardar de todas formas?</section>
       <footer class="modal-card-foot">
         <button @click="saveProduct2()" class="button is-success">Guardar</button>
         <button @click="showModal = false" class="button">Cancelar</button>
       </footer>
     </div>
   </div>
-  <card-component title="Agregar producto" :icon="AppsAddIn20Filled" >
-  <form @submit.prevent="saveProduct()" ref="form">
-  <FieldHorizontal label="Nombre">
-<p class="control">
-        <input
-          class="input upper"
-          @input="existProductWithSameName()"
-          :class="{ 'is-danger': existProductWithName }"
-          required
-          v-model.trim="product.name"
-        />
-        <span
-          v-if="existProductWithName"
-          class="help is-danger"
-        >Ya existe un producto con este nombre</span>
-</p>
-  </FieldHorizontal>
-<hr/>
+  <card-component title="Agregar producto" :icon="AppsAddIn20Filled">
+    <form @submit.prevent="saveProduct()" ref="form">
+      <FieldHorizontal label="Nombre">
+        <p class="control">
+          <input class="input upper" @input="existProductWithSameName()" :class="{ 'is-danger': existProductWithName }"
+            required v-model.trim="product.name" />
+          <span v-if="existProductWithName" class="help is-danger">Ya existe un producto con este nombre</span>
+        </p>
+      </FieldHorizontal>
+      <hr />
 
-    <table class="table is-bordered is-fullwidth">
-      <thead>
-        <tr>
-          <th>CODIGO</th>
-          <th>PACKING</th>
-          <th>PORCENTAJE DE GANANCIA</th>
-          <!-- <th>MEDIDA</th> -->
-          <th>PRECIO DE COMPRA</th>
-          <th>PRECIO DE VENTA</th>
-          <th>CANTIDAD</th>
-          <th>
-            <button type="button" class="button is-info" @click="addPackedProduct()">+</button>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <PackedProduct
-          v-for="(prod,index) in packedProducts"
-          :key="prod.id"
-          :product="prod"
-          @quit="quitPackedProduct($event)"
-          :ref=" (el:any) => { if (el) packsCompenents[index] = el }"
-        />
-      </tbody>
-    </table>
+      <table class="table is-bordered is-fullwidth">
+        <thead>
+          <tr>
+            <th>CODIGO</th>
+            <th>PACKING</th>
+            <th>PORCENTAJE DE GANANCIA</th>
+            <!-- <th>MEDIDA</th> -->
+            <th>PRECIO DE COMPRA</th>
+            <th>PRECIO DE VENTA</th>
+            <th>CANTIDAD</th>
+            <th>
+              <button type="button" class="button is-info" @click="addPackedProduct()">+</button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <PackedProduct v-for="(prod, index) in packedProducts" :key="prod.id" :product="prod"
+            @quit="quitPackedProduct($event)" :ref="(el: any) => { if (el) packsCompenents[index] = el }" />
+        </tbody>
+      </table>
 
-    <button class="button is-primary" :disabled="hasErrors">Guardar producto</button>
-    <button
-      v-if="props.productId !== -1"
-      type="button"
-      @click="emit('cancelEdit')"
-      class="button is-danger"
-    >Cancelar</button>
-      <span v-if="hasErrors" class="help is-danger">Hay codigos duplicados </span>
+      <button class="button is-primary" :disabled="hasErrors || deleting">Guardar producto</button>
 
-  </form>
+      <button v-if="user.roleId == 2 && props.productId !== -1" type="button" class="button is-danger mx-3" @click="showModalDelete = true">
+        Eliminar producto
+      </button>
+      <button v-if="props.productId !== -1" type="button" @click="emit('cancelEdit')" class="button">Cancelar</button>
+      <span v-if="hasErrors" class="help is-danger">Hay codigos duplicados</span>
+
+    </form>
   </card-component>
 
 </template>
@@ -85,6 +85,10 @@ import { toast } from '@/utils/toast'
 
 const store = useStore()
 const emit = defineEmits(['cancelEdit'])
+const user = store.state.user
+
+const showModalDelete = ref(false)
+const deleting = ref(false)
 
 const props = defineProps(
   {
@@ -120,7 +124,7 @@ const product = reactive({
 const packsCompenents = ref([] as any[])
 const packedProducts = ref([] as any)
 
-const buildNewPack = (packing:string, profitPercent:number, measureUnit:string, id = 'V' + Date.now()) => {
+const buildNewPack = (packing: string, profitPercent: number, measureUnit: string, id = 'V' + Date.now()) => {
   return {
     id: id,
     productId: product.id,
@@ -171,16 +175,16 @@ onMounted(() => {
 })
 
 const validateDuplicateCodes = () => {
-  const codes:[any] = packedProducts.value.map(({ code }:any) => code)
+  const codes: [any] = packedProducts.value.map(({ code }: any) => code)
   const duplicateCodes = codes.filter((c, index) => codes.indexOf(c) !== index && c.toString() !== '')
-  packedProducts.value.forEach((pp:any, index:number) => {
+  packedProducts.value.forEach((pp: any, index: number) => {
     if (pp.error === 1) return
     pp.error = 0
     duplicateCodes.forEach(dc => {
       if (pp.code === dc) packedProducts.value[index].error = 2
     })
   })
-  hasErrors.value = packedProducts.value.some((pp:any) => pp.error !== 0)
+  hasErrors.value = packedProducts.value.some((pp: any) => pp.error !== 0)
 }
 
 watchEffect(() => {
@@ -192,9 +196,9 @@ const addPackedProduct = () => {
   packedProducts.value.push(buildNewPack('', 25, 'BX'))
 }
 
-const quitPackedProduct = (idProd:any) => {
+const quitPackedProduct = (idProd: any) => {
   if (packedProducts.value.length === 1) return
-  const index = packedProducts.value.findIndex((el:any) => el.id === idProd)
+  const index = packedProducts.value.findIndex((el: any) => el.id === idProd)
   packedProducts.value.splice(index, 1)
 }
 
@@ -219,11 +223,12 @@ const saveProduct2 = async () => {
     toast.success('Producto guardado exitosamente', 2000)
   }
 }
+
 const saveProduct = async () => {
   const data = { action: props.productId !== -1 ? 'edit' : 'add', data: { product, packedProducts: [...packedProducts.value] } }
 
   if (existProductWithSameName()) return
-  if (packedProducts.value.some((el :any) => el.code === '')) {
+  if (packedProducts.value.some((el: any) => el.code === '')) {
     showModal.value = true
     return
   }
@@ -233,6 +238,24 @@ const saveProduct = async () => {
     toast.success('Producto guardado exitosamente', 2000)
   }
 }
+
+const deleteProduct = async () => {
+  console.log('eliminando producto')
+  deleting.value = true
+  const res = await store.dispatch('deleteProduct', { productId: product.id })
+  deleting.value = false
+  showModalDelete.value = false
+  if (res.success) {
+    toast.success(res.message, 3000)
+    resetForm()
+  } else {
+    toast.danger(res.message, 3000)
+  }
+
+  // idProductToEdit.value = product.id
+  // toggleAddEdit.value = false
+}
 </script>
 
-<style></style>
+<style>
+</style>
